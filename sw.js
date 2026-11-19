@@ -5,7 +5,7 @@
      and a fresh copy is fetched quietly in the background for the next time.
    - Firebase / Google / payment / any other website is never touched. Only files from your own site are saved. */
 
-var CACHE = "customiza-v1";          /* change v1 -> v2 (and re-upload) to force every visitor to drop old saved files */
+var CACHE = "customiza-v2";          /* change v1 -> v2 (and re-upload) to force every visitor to drop old saved files */
 var MAX_ENTRIES = 300;               /* safety limit: oldest saved files are removed after this many */
 var FRESH_JSON = true;               /* true: the design list (home.json) is taken from the network first (max 2.5s), saved copy only if slow/offline.
                                         false: it also opens instantly from the saved copy and refreshes in the background */
