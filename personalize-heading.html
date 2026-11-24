@@ -1,0 +1,81 @@
+<!--
+  HOW TO USE
+  Paste this whole <script> block just before </body> in your page
+  (or in your theme's custom code / "footer scripts" area).
+  It only ADDS one heading. Nothing else on the page is changed,
+  and the upload functionality is untouched.
+-->
+<script>
+(function () {
+  var NEW_TEXT = "Personalize Instant Studio";
+  var MARK = "data-personalize-heading";
+
+  // Smallest element whose own visible text matches the regex
+  function findByText(regex) {
+    var all = document.body.querySelectorAll("h1,h2,h3,h4,h5,h6,div,p,span");
+    var best = null;
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      var t = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (regex.test(t) && !el.hasAttribute(MARK)) {
+        if (!best || el.textContent.length < best.textContent.length) best = el;
+      }
+    }
+    return best;
+  }
+
+  function setText(el, text) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    var first = null, n;
+    while ((n = walker.nextNode())) {
+      if (n.nodeValue.trim()) {
+        if (!first) { first = n; n.nodeValue = text; }
+        else { n.nodeValue = ""; }
+      }
+    }
+    if (!first) el.textContent = text;
+  }
+
+  function run() {
+    if (document.querySelector("[" + MARK + "]")) return true;
+
+    var target = findByText(/^1\s*[·•.\-]?\s*upload your photo$/i);
+    if (!target) return false;
+
+    var source = findByText(/^instant design studio$/i);
+    var heading;
+
+    if (source) {
+      // Exact same tag, classes, and inline styles as "Instant Design Studio"
+      heading = source.cloneNode(true);
+      setText(heading, NEW_TEXT);
+    } else {
+      // Fallback: copy computed font styling from the "Upload your photo" heading
+      heading = document.createElement("h2");
+      heading.textContent = NEW_TEXT;
+      var cs = getComputedStyle(target);
+      heading.style.fontFamily = cs.fontFamily;
+      heading.style.fontWeight = cs.fontWeight;
+      heading.style.fontSize = cs.fontSize;
+      heading.style.color = cs.color;
+      heading.style.letterSpacing = cs.letterSpacing;
+      heading.style.textAlign = cs.textAlign;
+      heading.style.margin = "0 0 12px";
+    }
+
+    heading.removeAttribute("id");
+    heading.setAttribute(MARK, "true");
+    target.parentNode.insertBefore(heading, target);
+    return true;
+  }
+
+  // Run now, and keep watching in case the page renders after load
+  if (!run()) {
+    var obs = new MutationObserver(function () {
+      if (run()) obs.disconnect();
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+    setTimeout(function () { obs.disconnect(); }, 15000);
+  }
+})();
+</script>
